@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bootstrap 101 Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+      <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <h1>Hello, world!</h1>
+    <div class="alert alert-success hidden notifications-enabled">Notifications are go!</div>
+    <div class="alert alert-danger hidden notifications-disabled">Notifications disabled.    <button class="btn button-enable hidden">Enable notifications</button></div>
+    <div class="modal fade change">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">What are you doing right now?</h4>
+          </div>
+          <div class="modal-body">
+            <input type="text" name="activity" id="activity" class="form-control" placeholder="Current activity"/>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="start-activity">Start activity</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="list-group activity-list">
+      <li class="list-group-item hidden template"></li>
+    </ul>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/typeahead.min.js"></script>
+
+    <script src="js/timetracker.js"></script>
+  </body>
+</html>
