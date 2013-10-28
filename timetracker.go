@@ -1,42 +1,30 @@
 package main
 
 import (
-	"encoding/json"
+	"github.com/roelrymenants/timetracker/jsonhandler"
+	"github.com/roelrymenants/timetracker/config"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-type Config struct {
-	WebRoot string
-}
+func prepareFlags(configPath *string) {
+	flag.StringVar(configPath, "config", "config.json", "Path to config.json file (e.g. /home/foo/bar/config.json)")
 
-func (config *Config) ReadFrom(path string) (err error) {
-	b, err := ioutil.ReadFile(path)
-	if err != nil {
-		fmt.Print("Error reading config file", err)
-		return
-	}
-	err = json.Unmarshal(b, &config)
-	if err != nil {
-		fmt.Print("bad json ", err)
-	}
-	return
+	flag.Parse()
 }
 
 func main() {
 	var configPath string
-	flag.StringVar(&configPath, "config", "config.json", "Path to config.json file (e.g. /home/foo/bar/config.json)")
+	prepareFlags(&configPath)
 
-	flag.Parse()
+	configuration := config.LoadConfig(configPath)
 
-	config := &Config{}
+	httpAddress := fmt.Sprintf("%s:%s", configuration.Http.Host, configuration.Http.Port)
 
-	config.ReadFrom(configPath)
+	http.Handle(configuration.AppRoot, http.StripPrefix(configuration.AppRoot, http.FileServer(http.Dir(configuration.WebRoot))))
+	http.Handle(configuration.JsonRoot, http.StripPrefix(configuration.JsonRoot ,jsonhandler.NewJsonHandler(configuration.Jira.Url, configuration.Jira.Login, configuration.Jira.Password)))
 
-	fmt.Print(config.WebRoot)
-
-	log.Fatal(http.ListenAndServe(":8090", http.FileServer(http.Dir(config.WebRoot))))
+	log.Fatal(http.ListenAndServe(httpAddress, nil))
 }

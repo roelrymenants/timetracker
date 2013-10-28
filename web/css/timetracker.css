@@ -1,0 +1,7 @@
+.edit-row {display: none;}
+
+.edit-row .help-block {display: none;}
+.has-error .edit-row .help-block {display: block;}
+
+.editable .edit-row {display: block;}
+.editable .display-row {display: none;}

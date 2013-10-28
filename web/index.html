@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Bootstrap 101 Template</title>
+    <title>Time Tracker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-      <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">
+    <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" media="screen">
+    <link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" media="screen">
+
+    <link href="css/timetracker.css" rel="stylesheet" media="screen">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -14,9 +17,18 @@
     <![endif]-->
   </head>
   <body>
-    <h1>Hello, world!</h1>
-    <div class="alert alert-success hidden notifications-enabled">Notifications are go!</div>
-    <div class="alert alert-danger hidden notifications-disabled">Notifications disabled.    <button class="btn button-enable hidden">Enable notifications</button></div>
+    <section class="container">
+      <h1>Tracking your time</h1>
+      <div class="alert alert-success hidden notifications-enabled">Notifications are go!</div>
+      <div class="alert alert-danger hidden notifications-disabled">Notifications disabled.    <button class="btn button-enable hidden">Enable notifications</button></div>
+
+    <div class="panel-group main-view">
+    </div>
+      <button class="btn btn-primary" data-toggle="modal" data-target=".change">Add activity</button>
+      <button class="btn btn-info" data-action="export">Export to CSV</button>
+        <button class="btn btn-warning" data-toggle="modal" data-target=".import">Import from CSV</button>
+    </section>
+
     <div class="modal fade change">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -35,12 +47,131 @@
       </div>
     </div>
 
-    <ul class="list-group activity-list">
-      <li class="list-group-item hidden template"></li>
-    </ul>
+    <div class="modal fade import">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Import from CSV</h4>
+          </div>
+          <div class="modal-body">
+              <textarea name="csv" class="form-control" placeholder="Copy/Paste CSV to import"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-action="import">Import</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/template" id="activity-group">
+        <div class="panel-heading">
+            <a data-toggle="collapse" data-target=".my-test">
+                <h4><%= date %></h4>
+            </a>
+        </div>
+        <div class="panel-collapse collapse in my-test">
+            <div class="panel-body">
+                <ul class="list-group activity-list">
+                    <li class="list-group-item row active">
+                        <span class="time col-sm-3">
+                        Start time
+                        </span>
+                        <span class="time col-sm-3">
+                        End time
+                        </span>
+                        <span class="name col-sm-3">
+                        Name
+                        </span>
+                        <div class="glyphicon glyphicon-cog col-sm-3"></div>
+                    </li>
+                </ul>
+                <ul class="list-group sum-list">
+                </ul>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="activity-list-item">
+        <div class="row display-row <% if (!model.endTime()) { %>text-primary<% } %>">
+            <span class="time col-sm-3 value-component" data-name="startTime">
+                <% print(model.startTime().toLocaleString()); %>
+            </span>
+            <span class="time col-sm-3 value-component" data-name="endTime">
+                <% if (model.endTime()) {print(model.endTime().toLocaleString());} %>
+            </span>
+            <span class="name col-sm-3 value-component" data-name="name">
+                <%= model.name() %>
+            </span>
+            <span class="controls col-sm-3 btn-group">
+                <% if (model.endTime()) { %>
+                    <button class="btn btn-info resume">Resume</button>
+                <% } else { %>
+                    <button class="btn btn-warning stop">Stop</button>
+                <% } %>
+                <button class="btn btn-danger delete">Delete</button>
+                <button class="btn btn-default push">Push</button>
+            </span>
+            <span class="description col-sm-6 value-component small" data-name="description">
+                <blockquote><%= model.description() %></blockquote>
+            </span>
+        </div>
+        <div class="row edit-row form-group">
+            <span class="time col-sm-3 value-component">
+                <input type="datetime-local" class="form-control" name="startTime" value="<%= formatDateTime(model.startTime()) %>"/>
+                <p class="help-block"></p>
+            </span>
+            <span class="time col-sm-3 value-component">
+                <input type="datetime-local" class="form-control" name="endTime" value="<% if (model.endTime()) {print(formatDateTime(model.endTime()));} %>"/>
+                <p class="help-block"></p>
+            </span>
+            <span class="name col-sm-3 value-component">
+                <input type="text" class="form-control" name="name" value="<%= model.name() %>"/>
+                <p class="help-block"></p>
+            </span>
+            <span class="controls col-sm-3">
+                <button class="btn btn-primary pull-right save">Save</button>
+            </span>
+            <span class="name col-sm-6 value-component">
+                <input type="text" class="form-control" name="description" value="<%= model.description() %>"/>
+                <p class="help-block"></p>
+            </span>
+        </div>
+        <% _(model.worklogs).each(function(worklog) { %>
+        <div class="row text-muted">
+            <div class="col-sm-2">
+            <%= worklog.startTime.toLocaleString() %>
+            </div>
+            <div class="col-sm-2">
+            <%= worklog.endTime.toLocaleString() %>
+            </div>
+            <div class="col-sm-4">
+                <%= worklog.comment %> <span class="label label-primary">Jira</span>
+            </div>
+            <div class="col-sm-2">
+                <%= worklog.author.displayName %>
+            </div>
+            <div class="col-sm-2">
+            </div>
+        </div>
+        <% }); %>
+    </script>
+
+    <script type="text/template" id="activity-sum">
+    <%= Math.round(activities.reduce(function(memo, activity) {
+        return memo + activity.timeSpentSeconds()/(60*60);
+        }, 0))
+    %>h
+    </script>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/underscore.string.js"></script>
+    <script src="js/backbone.js"></script>
+    <script src="js/backbone.localStorage.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/typeahead.min.js"></script>
