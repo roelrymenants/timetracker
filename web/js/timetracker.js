@@ -494,6 +494,11 @@ $(document).ready(function() {
 			this.$el.removeClass();
 			this.$el.addClass(this.className);
 
+			this.$collapsible = this.$el.find(".panel-collapse");
+
+			this.$el.find("a[data-toggle='collapse']").attr("data-target", "[data-date='" + this.date + "']");
+			this.$collapsible.attr("data-date", this.date);
+
 			this.$list = this.$el.find(".activity-list");
 			this.$sumListElement = this.$el.find(".sum-list");
 
@@ -506,6 +511,10 @@ $(document).ready(function() {
 			this.sumView = new TimeTracker.SumView({collection: activityList});
 			this.$sumListElement.append(this.sumView.render().el);
 
+			if (this.date != (new Date()).toDateString()) {
+				this.$collapsible.collapse("hide");
+			}
+
 			return this;
 		},
 
@@ -516,7 +525,7 @@ $(document).ready(function() {
 		},
 
 		addAll: function() {
-			this.$el.remove(".activity");
+			this.$list.remove(".activity");
 
 			var onThisDay = this.collection.filter(function(model) {
 				return (model.date() == this.date);

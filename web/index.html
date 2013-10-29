@@ -22,11 +22,14 @@
       <div class="alert alert-success hidden notifications-enabled">Notifications are go!</div>
       <div class="alert alert-danger hidden notifications-disabled">Notifications disabled.    <button class="btn button-enable hidden">Enable notifications</button></div>
 
-    <div class="panel-group main-view">
-    </div>
-      <button class="btn btn-primary" data-toggle="modal" data-target=".change">Add activity</button>
-      <button class="btn btn-info" data-action="export">Export to CSV</button>
-        <button class="btn btn-warning" data-toggle="modal" data-target=".import">Import from CSV</button>
+        <div class="panel-group main-view">
+        </div>
+
+        <div class="general-actions">
+          <button class="btn btn-primary" data-toggle="modal" data-target=".change">Add activity</button>
+          <button class="btn btn-info" data-action="export">Export to CSV</button>
+          <button class="btn btn-warning" data-toggle="modal" data-target=".import">Import from CSV</button>
+        </div>
     </section>
 
     <div class="modal fade change">
@@ -67,11 +70,11 @@
 
     <script type="text/template" id="activity-group">
         <div class="panel-heading">
-            <a data-toggle="collapse" data-target=".my-test">
+            <a data-toggle="collapse" data-target="">
                 <h4><%= date %></h4>
             </a>
         </div>
-        <div class="panel-collapse collapse in my-test">
+        <div class="panel-collapse collapse in">
             <div class="panel-body">
                 <ul class="list-group activity-list">
                     <li class="list-group-item row active">
