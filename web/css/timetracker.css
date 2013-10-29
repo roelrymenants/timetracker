@@ -5,3 +5,16 @@
 
 .editable .edit-row {display: block;}
 .editable .display-row {display: none;}
+
+.panel-body {
+	padding-left: 25px;
+	padding-right: 25px;
+}
+
+.panel-group {
+	margin-bottom: 10px;
+}
+
+.general-actions {
+	margin-bottom: 10px;
+}
